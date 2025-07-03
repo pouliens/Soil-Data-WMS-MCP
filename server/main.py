@@ -4,18 +4,49 @@ import asyncio
 import json
 import logging
 import sys
+import os
 from typing import List, Optional, Union
 
-from fastmcp import FastMCP
-from pydantic import BaseModel, Field
+# Add lib directory to path for bundled dependencies
+lib_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lib')
+if os.path.exists(lib_dir):
+    sys.path.insert(0, lib_dir)
+
+# Try to import dependencies, fallback to minimal implementation
+try:
+    from fastmcp import FastMCP
+    HAS_FASTMCP = True
+except ImportError:
+    print("FastMCP not available - using minimal MCP implementation", file=sys.stderr)
+    from minimal_mcp import MinimalMCP
+    HAS_FASTMCP = False
+
+try:
+    from pydantic import BaseModel, Field
+    HAS_PYDANTIC = True
+except ImportError:
+    print("Pydantic not available - using basic data classes", file=sys.stderr)
+    HAS_PYDANTIC = False
+    
+    # Minimal BaseModel replacement
+    class BaseModel:
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+    
+    def Field(default=None, description=""):
+        return default
 
 from utils import WMSClient, BoundingBox
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize FastMCP server
-mcp = FastMCP("BGS Soil Data WMS")
+# Initialize MCP server
+if HAS_FASTMCP:
+    mcp = FastMCP("BGS Soil Data WMS")
+else:
+    mcp = MinimalMCP("BGS Soil Data WMS")
 
 
 class GetMapRequest(BaseModel):
@@ -224,6 +255,73 @@ async def get_soil_data_summary() -> dict:
 
 def main():
     """Main entry point for the MCP server"""
+    # Check for demo mode
+    if len(sys.argv) > 1 and sys.argv[1] == "--demo":
+        print("🌍 BGS Soil Data WMS MCP Server - Demo Mode")
+        print("=" * 60)
+        
+        async def demo():
+            print("\nTesting all 7 MCP tools...\n")
+            
+            # Test get_soil_data_summary
+            print("1. 📋 Soil Data Summary:")
+            result = await get_soil_data_summary()
+            print(f"   Found {len(result['soil_data_types'])} soil data types")
+            
+            # Test get_capabilities  
+            print("\n2. 🔍 BGS WMS Service Capabilities:")
+            caps = await get_capabilities()
+            print(f"   Service: {caps['title']}")
+            print(f"   Available layers: {len(caps['layers'])}")
+            
+            # Test list_layers
+            print("\n3. 📃 List Available Layers:")
+            layers = await list_layers()
+            print(f"   Total layers: {len(layers)}")
+            for i, layer in enumerate(layers[:3]):
+                print(f"   {i+1}. {layer['name']}: {layer['title']}")
+            
+            # Test search layers
+            print("\n4. 🔎 Search for 'depth' layers:")
+            depth_layers = await list_layers("depth")
+            print(f"   Found {len(depth_layers)} depth-related layers")
+            
+            # Test describe_layer
+            if layers:
+                print(f"\n5. 📖 Describe layer '{layers[0]['name']}':")
+                layer_info = await describe_layer(layers[0]['name'])
+                if layer_info:
+                    print(f"   Title: {layer_info['title']}")
+                    print(f"   Queryable: {layer_info['queryable']}")
+            
+            # Test coordinate conversion
+            print("\n6. 🗺️  Coordinate Conversion:")
+            conv_req = ConvertCoordinatesRequest(
+                x=-0.1276, y=51.5074,
+                source_crs="EPSG:4326", target_crs="EPSG:27700"
+            )
+            result = await convert_coordinates(conv_req)
+            print(f"   London: {result['source']['x']}, {result['source']['y']} (WGS84)")
+            print(f"   →       {result['target']['x']:.0f}, {result['target']['y']:.0f} (BNG)")
+            
+            # Test get_map
+            print("\n7. 🖼️  Generate Map URL:")
+            map_req = GetMapRequest(
+                layers=layers[0]['name'],
+                min_x=-6.0, min_y=50.0, max_x=2.0, max_y=58.0,
+                width=400, height=300
+            )
+            map_url = await get_map(map_req)
+            print(f"   Generated URL: {map_url[:60]}...")
+            
+            print("\n" + "=" * 60)
+            print("✅ All BGS WMS MCP tools working successfully!")
+            print("\nTo run as MCP server: python server/main.py")
+            print("To create DXT package: zip -r soil-data-wms.dxt manifest.json server/ requirements.txt")
+        
+        asyncio.run(demo())
+        return
+    
     try:
         mcp.run()
     except KeyboardInterrupt:
