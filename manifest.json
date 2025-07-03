@@ -1,0 +1,56 @@
+{
+  "name": "BGS Soil Data WMS",
+  "version": "1.0.0",
+  "description": "MCP server for accessing BGS soil property data through WMS service",
+  "type": "mcp-server",
+  "author": "Your Name",
+  "license": "MIT",
+  "main": "server/main.py",
+  "python": {
+    "version": ">=3.8",
+    "requirements": "requirements.txt"
+  },
+  "mcp": {
+    "server": {
+      "command": "python",
+      "args": ["server/main.py"]
+    }
+  },
+  "capabilities": {
+    "tools": [
+      {
+        "name": "get_capabilities",
+        "description": "Get WMS service capabilities and available layers"
+      },
+      {
+        "name": "get_map", 
+        "description": "Generate map image URL for specified layers and bounds"
+      },
+      {
+        "name": "get_feature_info",
+        "description": "Get detailed information about features at coordinates"
+      },
+      {
+        "name": "list_layers",
+        "description": "List available soil data layers"
+      },
+      {
+        "name": "describe_layer",
+        "description": "Get detailed information about a specific layer"
+      },
+      {
+        "name": "convert_coordinates",
+        "description": "Convert coordinates between different CRS"
+      },
+      {
+        "name": "get_soil_data_summary",
+        "description": "Get summary of available soil data types"
+      }
+    ]
+  },
+  "keywords": ["soil", "wms", "bgs", "geological", "mapping"],
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
