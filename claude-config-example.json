@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "bgs-soil-wms": {
-      "command": "python",
-      "args": ["server/main.py"],
-      "cwd": "/data/data/com.termux/files/home/my-projects/soil-data-wms-mcp"
-    }
-  }
-}

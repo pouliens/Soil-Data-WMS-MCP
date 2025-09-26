@@ -23,20 +23,20 @@
         "description": "Get WMS service capabilities and available layers"
       },
       {
-        "name": "get_map", 
-        "description": "Generate map image URL for specified layers and bounds"
+        "name": "get_soil_map_url", 
+        "description": "Generate WMS GetMap URL for soil data visualization"
       },
       {
-        "name": "get_feature_info",
-        "description": "Get detailed information about features at coordinates"
+        "name": "get_soil_data_at_location",
+        "description": "Get detailed soil information at specific coordinates"
       },
       {
-        "name": "list_layers",
-        "description": "List available soil data layers"
+        "name": "get_available_soil_layers",
+        "description": "Get available soil data layers from BGS WMS service"
       },
       {
-        "name": "describe_layer",
-        "description": "Get detailed information about a specific layer"
+        "name": "get_soil_layer_info",
+        "description": "Get detailed information about a specific soil data layer"
       },
       {
         "name": "convert_coordinates",

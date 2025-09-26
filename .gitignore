@@ -22,29 +22,6 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
-
 # Virtual environments
 .env
 .venv
@@ -54,55 +31,24 @@ ENV/
 env.bak/
 venv.bak/
 
-# IDEs
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Claude Code
-.claude/
-claude/
-.claude-*
-claude-*
-
-# OS generated files
+# OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
 # Logs
 *.log
-logs/
 
-# Temporary files
-*.tmp
-*.temp
-temp/
-tmp/
+# Testing
+test_*.py
+*_test.py
+debug_*.py
 
-# DXT package files
+# Deployment
 *.dxt
-*.zip
-
-# Cache files
-.cache/
-cache/
-
-# Local configuration files
-config.local.*
-settings.local.*
-.env.local
-
-# Test outputs
-test-output/
-debug-output/
-
-# MCP specific
-mcp-debug/
-mcp-logs/
